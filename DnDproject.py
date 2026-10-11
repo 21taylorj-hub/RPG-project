@@ -477,14 +477,21 @@ def explore_dungeon(player_character):
     
     
     # Initilalise enemy variables the player will go into combat with
-    
-    combat_loop(player_character, derived_stats_list, current_hp)
+    # Strucutre is [enemy name, enemy type, enemy level]
+    enemy_structure = ["moss skeleton", "sword", 40]
+
+    combat_loop(player_character, derived_stats_list, current_hp, enemy_structure)
 
 
 # -------------------------------------------------------
 # Combat
 # -------------------------------------------------------
-def combat_loop(player_character, derived_stats_list, current_hp):
+def combat_loop(player_character, derived_stats_list, current_hp, enemy_structure):
+    # Initialise enemy based on enemy_structure
+    enemy_derived_stats_list = define_enemy(enemy_structure)
+
+    enemy_turn(enemy_derived_stats_list)
+
     player_turn(player_character, derived_stats_list, current_hp)
 
 def derived_stats(player_character):
@@ -685,7 +692,26 @@ def heal(derived_stats_list, current_hp):
 # -------------------------------------------------------
 # Enemy
 # -------------------------------------------------------
-def define_enemy():
+def define_enemy(enemy_structure):
+    enemy_name = enemy_structure[0]
+    enemy_type = enemy_structure[1]
+    enemy_hp = enemy_structure[2] * 11
+    enemy_damage = enemy_structure[2] * 2
+    enemy_derived_stats_list = [enemy_name, enemy_type, enemy_hp, enemy_damage]
+    return enemy_derived_stats_list
+
+def enemy_turn(enemy_derived_stats_list):
+    attack_choice = random.randint(1,10)
+    if attack_choice <= 3:
+        if enemy_derived_stats_list[1] == "sword":
+            display_text("The ", enemy_derived_stats_list[0], "raises its sword high and slams it down onto you")
+            time.sleep(0.5)
+            print("You take", enemy_derived_stats_list[3] * 2 , "damage")
+    elif attack_choice < 3:
+        if enemy_derived_stats_list[1] == "sword":
+            display_text("The ", enemy_derived_stats_list[0], "performs a swift strike with its sword")
+            time.sleep(0.5)
+            print("You take", enemy_derived_stats_list[3], "damage")
 
 # -------------------------------------------------------
 # Main program
