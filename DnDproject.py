@@ -101,7 +101,7 @@ def display_text(text_to_display):
     for letter in text:
         print(letter, end='')  
         sys.stdout.flush()  
-        time.sleep(0.02)  
+        time.sleep(0.0)  
     print("")
 
 # -------------------------------------------------------
@@ -451,8 +451,10 @@ def explore_world(player_character):
 
 
 def explore_dungeon(player_character):
+    # Initialise player stats when they enter the area
     derived_stats_list = derived_stats(player_character)
     current_hp = derived_stats_list[0]
+    
     print("--------------------------")
     display_text("TRAVELLING TO : The Sunken Ossuary")
     print("--------------------------")
@@ -472,6 +474,10 @@ def explore_dungeon(player_character):
     display_text("The figure steps into the light to reveal a skeleton, its bones stained a moss green")
     display_text("It tilts its skull, a dull, dead weight shifting in its empty sockets")
     display_text("It draws a rusted, serated broadsword, standing between you and the only exit...")
+    
+    
+    # Initilalise enemy variables the player will go into combat with
+    
     combat_loop(player_character, derived_stats_list, current_hp)
 
 
@@ -479,7 +485,6 @@ def explore_dungeon(player_character):
 # Combat
 # -------------------------------------------------------
 def combat_loop(player_character, derived_stats_list, current_hp):
-    #derived_stats_list = derived_stats(player_character)
     player_turn(player_character, derived_stats_list, current_hp)
 
 def derived_stats(player_character):
@@ -676,6 +681,11 @@ def heal(derived_stats_list, current_hp):
     else:
         current_hp = derived_stats_list[0] 
         return current_hp
+
+# -------------------------------------------------------
+# Enemy
+# -------------------------------------------------------
+def define_enemy():
 
 # -------------------------------------------------------
 # Main program
