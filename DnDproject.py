@@ -677,7 +677,7 @@ def heal(derived_stats_list, current_hp):
         current_hp = derived_stats_list[0] 
         return current_hp
 # SAVING CHANGES TO GITHUB TEST
-print("SAVE THIS TO GITHUB")
+print("SAVE THIS TO GITHUB PLEASE")
 # -------------------------------------------------------
 # Main program
 # -------------------------------------------------------
