@@ -492,7 +492,8 @@ def combat_loop(player_character, derived_stats_list, current_hp, enemy_structur
 
     enemy_turn(enemy_derived_stats_list)
 
-    player_turn(player_character, derived_stats_list, current_hp)
+    player_turn(player_character, derived_stats_list, current_hp, enemy_derived_stats_list)
+    
 
 def derived_stats(player_character):
     hp_max = player_character.vig * 10
@@ -514,7 +515,7 @@ def derived_stats(player_character):
     hp_fp_dmg = [hp_max, mana, damage]
     return hp_fp_dmg
 
-def player_turn(player_character, derived_stats_list, current_hp):
+def player_turn(player_character, derived_stats_list, current_hp, enemy_derived_stats_list):
     display_text("ACTIONS:")
     print()
     if player_character.player_class == "knight":
@@ -531,6 +532,8 @@ def player_turn(player_character, derived_stats_list, current_hp):
                 time.sleep(0.5)
                 print("They take", derived_stats_list[2], "damage")
                 # DEAL DAMAGE FUNCTION HERE
+                damage_to_deal = derived_stats_list[2]
+                player_deal_damage(damage_to_deal, enemy_derived_stats_list)
                 valid_choice = True
             elif action == "2":
                 display_text("You raise your shield and assume a defensive stance")
@@ -679,6 +682,12 @@ def player_turn(player_character, derived_stats_list, current_hp):
                 valid_choice = False
         valid_choice = False
 
+
+def player_deal_damage(damage_to_deal, enemy_derived_stats_list):
+    enemy_derived_stats_list[2] = enemy_derived_stats_list[2] - damage_to_deal
+    print("The", enemy_derived_stats_list[0], "has", enemy_derived_stats_list[2], "HP left")
+    
+
 # Healing
 def heal(derived_stats_list, current_hp):
     health_to_heal = derived_stats_list[0] // 4
@@ -702,14 +711,15 @@ def define_enemy(enemy_structure):
 
 def enemy_turn(enemy_derived_stats_list):
     attack_choice = random.randint(1,10)
+    print("Attck choich is", attack_choice)
     if attack_choice <= 3:
         if enemy_derived_stats_list[1] == "sword":
-            display_text("The ", enemy_derived_stats_list[0], "raises its sword high and slams it down onto you")
+            print("The ", enemy_derived_stats_list[0], "raises its sword high and slams it down onto you")
             time.sleep(0.5)
             print("You take", enemy_derived_stats_list[3] * 2 , "damage")
-    elif attack_choice < 3:
+    elif attack_choice > 3:
         if enemy_derived_stats_list[1] == "sword":
-            display_text("The ", enemy_derived_stats_list[0], "performs a swift strike with its sword")
+            print("The ", enemy_derived_stats_list[0], "performs a swift strike with its sword")
             time.sleep(0.5)
             print("You take", enemy_derived_stats_list[3], "damage")
 
