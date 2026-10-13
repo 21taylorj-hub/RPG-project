@@ -490,10 +490,22 @@ def combat_loop(player_character, derived_stats_list, current_hp, enemy_structur
     # Initialise enemy based on enemy_structure
     enemy_derived_stats_list = define_enemy(enemy_structure)
 
-    enemy_turn(enemy_derived_stats_list)
+    #enemy_turn(enemy_derived_stats_list)
+    #player_turn(player_character, derived_stats_list, current_hp, enemy_derived_stats_list)
+    while current_hp > 0 and enemy_derived_stats_list[2] > 0:
+        if enemy_derived_stats_list[2] > 0 and current_hp > 0:
+            display_text("Your turn:")
+            print()
+            player_turn(player_character, derived_stats_list, current_hp, enemy_derived_stats_list)
+        if enemy_derived_stats_list[2] > 0 and current_hp > 0:
+            display_text("Enemy turn:")
+            print()
+            enemy_turn(enemy_derived_stats_list, current_hp)
 
-    player_turn(player_character, derived_stats_list, current_hp, enemy_derived_stats_list)
-    
+        if enemy_derived_stats_list[2] <= 0:
+            display_text("You win")
+        elif current_hp == 0:
+            print("You loose")
 
 def derived_stats(player_character):
     hp_max = player_character.vig * 10
@@ -705,27 +717,32 @@ def define_enemy(enemy_structure):
     enemy_name = enemy_structure[0]
     enemy_type = enemy_structure[1]
     enemy_hp = enemy_structure[2] * 11
-    enemy_damage = enemy_structure[2] * 2
+    enemy_damage = enemy_structure[2] * 1.5
     enemy_derived_stats_list = [enemy_name, enemy_type, enemy_hp, enemy_damage]
     return enemy_derived_stats_list
 
-def enemy_turn(enemy_derived_stats_list):
+def enemy_turn(enemy_derived_stats_list, current_hp):
     attack_choice = random.randint(1,10)
-    print("Attck choich is", attack_choice)
     if attack_choice <= 3:
         if enemy_derived_stats_list[1] == "sword":
             print("The ", enemy_derived_stats_list[0], "raises its sword high and slams it down onto you")
             time.sleep(0.5)
             print("You take", enemy_derived_stats_list[3] * 2 , "damage")
+            enemy_damage_to_deal = enemy_derived_stats_list[3] * 2
+            enemy_deal_damage(enemy_damage_to_deal, current_hp)
     elif attack_choice > 3:
         if enemy_derived_stats_list[1] == "sword":
             print("The ", enemy_derived_stats_list[0], "performs a swift strike with its sword")
             time.sleep(0.5)
             print("You take", enemy_derived_stats_list[3], "damage")
+            enemy_damage_to_deal = enemy_derived_stats_list[3]
+            enemy_deal_damage(enemy_damage_to_deal, current_hp)
 
+def enemy_deal_damage(enemy_damage_to_deal, current_hp):
+    current_hp = current_hp - enemy_damage_to_deal
+    print("You have", current_hp, "HP left")
 # -------------------------------------------------------
 # Main program
 # -------------------------------------------------------
 player_character = first_main_menu()
 main_menu(player_character)
-#explore_world(player_character)
