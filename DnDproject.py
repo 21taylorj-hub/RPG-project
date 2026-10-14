@@ -482,33 +482,37 @@ def explore_dungeon(player_character):
 
     combat_loop(player_character, derived_stats_list, current_hp, enemy_structure)
 
-
 # -------------------------------------------------------
 # Combat
 # -------------------------------------------------------
 def combat_loop(player_character, derived_stats_list, current_hp, enemy_structure):
     # Initialise enemy based on enemy_structure
     enemy_derived_stats_list = define_enemy(enemy_structure)
+    enemy_current_hp = enemy_derived_stats_list[2]
 
     #enemy_turn(enemy_derived_stats_list)
     #player_turn(player_character, derived_stats_list, current_hp, enemy_derived_stats_list)
-    while current_hp > 0 and enemy_derived_stats_list[2] > 0:
-        if enemy_derived_stats_list[2] > 0 and current_hp > 0:
+    while current_hp > 0 and enemy_current_hp > 0:
+        if enemy_current_hp > 0 and current_hp > 0:
             display_text("Your turn:")
             print()
-            player_turn(player_character, derived_stats_list, current_hp, enemy_derived_stats_list)
-        if enemy_derived_stats_list[2] > 0 and current_hp > 0:
+            returned_action = player_turn(player_character, derived_stats_list, current_hp, enemy_derived_stats_list, enemy_current_hp)
+            if returned_action == enemy_current_hp:
+                current_hp = heal(derived_stats_list, current_hp)
+            else:
+                returned_action = enemy_current_hp 
+        if enemy_current_hp > 0 and current_hp > 0:
             display_text("Enemy turn:")
             print()
-            enemy_turn(enemy_derived_stats_list, current_hp)
+            current_hp = enemy_turn(enemy_derived_stats_list, current_hp)
 
-        if enemy_derived_stats_list[2] <= 0:
-            display_text("You win")
-        elif current_hp == 0:
-            print("You loose")
+    if enemy_current_hp <= 0:
+        display_text("You win")
+    elif current_hp <= 0:
+        print("You loose")
 
 def derived_stats(player_character):
-    hp_max = player_character.vig * 10
+    hp_max = player_character.vig * 20
     if player_character.player_class == "mage" or player_character.player_class == "necromancer":
         mana = player_character.mind * 10
     else:
@@ -527,7 +531,7 @@ def derived_stats(player_character):
     hp_fp_dmg = [hp_max, mana, damage]
     return hp_fp_dmg
 
-def player_turn(player_character, derived_stats_list, current_hp, enemy_derived_stats_list):
+def player_turn(player_character, derived_stats_list, current_hp, enemy_derived_stats_list, enemy_current_hp):
     display_text("ACTIONS:")
     print()
     if player_character.player_class == "knight":
@@ -545,20 +549,23 @@ def player_turn(player_character, derived_stats_list, current_hp, enemy_derived_
                 print("They take", derived_stats_list[2], "damage")
                 # DEAL DAMAGE FUNCTION HERE
                 damage_to_deal = derived_stats_list[2]
-                player_deal_damage(damage_to_deal, enemy_derived_stats_list)
+                enemy_current_hp = player_deal_damage(damage_to_deal, enemy_derived_stats_list, enemy_current_hp)
                 valid_choice = True
+                return enemy_current_hp
             elif action == "2":
                 display_text("You raise your shield and assume a defensive stance")
                 time.sleep(0.5)
                 print("Enemy's next attack will be blocked")
                 # DEAL DAMAGE FUNCTION HAS NO EFFECT HERE
                 # PRINT ATTACK BLOCKED MESSAGE INSTEAD
+                return enemy_current_hp
                 valid_choice = True
             elif action == "3":
                 display_text("You pull the potion from your satchel and take a good swig")
                 time.sleep(0.5)
-                current_hp = heal(derived_stats_list, current_hp)
+                #current_hp = heal(derived_stats_list, current_hp)
                 valid_choice = True
+                return enemy_current_hp
             else:
                 display_text("Please pick a valid option (1, 2, 3)")
                 valid_choice = False
@@ -695,10 +702,10 @@ def player_turn(player_character, derived_stats_list, current_hp, enemy_derived_
         valid_choice = False
 
 
-def player_deal_damage(damage_to_deal, enemy_derived_stats_list):
-    enemy_derived_stats_list[2] = enemy_derived_stats_list[2] - damage_to_deal
-    print("The", enemy_derived_stats_list[0], "has", enemy_derived_stats_list[2], "HP left")
-    
+def player_deal_damage(damage_to_deal, enemy_derived_stats_list, enemy_current_hp):
+    enemy_current_hp = enemy_current_hp - damage_to_deal
+    print("The", enemy_derived_stats_list[0], "has", enemy_current_hp, "HP left")
+    return enemy_current_hp
 
 # Healing
 def heal(derived_stats_list, current_hp):
@@ -717,7 +724,7 @@ def define_enemy(enemy_structure):
     enemy_name = enemy_structure[0]
     enemy_type = enemy_structure[1]
     enemy_hp = enemy_structure[2] * 11
-    enemy_damage = enemy_structure[2] * 1.5
+    enemy_damage = enemy_structure[2] * 2
     enemy_derived_stats_list = [enemy_name, enemy_type, enemy_hp, enemy_damage]
     return enemy_derived_stats_list
 
@@ -729,18 +736,21 @@ def enemy_turn(enemy_derived_stats_list, current_hp):
             time.sleep(0.5)
             print("You take", enemy_derived_stats_list[3] * 2 , "damage")
             enemy_damage_to_deal = enemy_derived_stats_list[3] * 2
-            enemy_deal_damage(enemy_damage_to_deal, current_hp)
+            current_hp = enemy_deal_damage(enemy_damage_to_deal, current_hp)
+            return current_hp
     elif attack_choice > 3:
         if enemy_derived_stats_list[1] == "sword":
             print("The ", enemy_derived_stats_list[0], "performs a swift strike with its sword")
             time.sleep(0.5)
             print("You take", enemy_derived_stats_list[3], "damage")
             enemy_damage_to_deal = enemy_derived_stats_list[3]
-            enemy_deal_damage(enemy_damage_to_deal, current_hp)
+            current_hp = enemy_deal_damage(enemy_damage_to_deal, current_hp)
+            return current_hp
 
 def enemy_deal_damage(enemy_damage_to_deal, current_hp):
     current_hp = current_hp - enemy_damage_to_deal
     print("You have", current_hp, "HP left")
+    return current_hp
 # -------------------------------------------------------
 # Main program
 # -------------------------------------------------------
