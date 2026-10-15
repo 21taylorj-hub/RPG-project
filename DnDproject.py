@@ -489,6 +489,9 @@ def combat_loop(player_character, derived_stats_list, current_hp, enemy_structur
     # Initialise enemy based on enemy_structure
     enemy_derived_stats_list = define_enemy(enemy_structure)
     enemy_current_hp = enemy_derived_stats_list[2]
+    # Initialise player class specific variables
+    if player_character.player_class == "necromancer":
+        necro_queued_turns = 0
 
     #enemy_turn(enemy_derived_stats_list)
     #player_turn(player_character, derived_stats_list, current_hp, enemy_derived_stats_list)
@@ -497,8 +500,13 @@ def combat_loop(player_character, derived_stats_list, current_hp, enemy_structur
             display_text("Your turn:")
             print()
             returned_action = player_turn(player_character, derived_stats_list, current_hp, enemy_derived_stats_list, enemy_current_hp)
-            if returned_action == enemy_current_hp:
+            if returned_action == "healing":
                 current_hp = heal(derived_stats_list, current_hp)
+            elif returned_action == "blocking": # KNIGHT special action - block
+                returned_action == player_turn(player_character, derived_stats_list, current_hp, enemy_derived_stats_list, enemy_current_hp)
+            elif returned_action == "increased crit":
+                crit_chance_multiplier = 3 # YOU WERE MAKING THE SAMURAI CRIT MULTIPLIER WORK!!!
+            # If no special action applied, let the enemy take dmg
             else:
                 returned_action = enemy_current_hp 
         if enemy_current_hp > 0 and current_hp > 0:
@@ -532,9 +540,15 @@ def derived_stats(player_character):
     return hp_fp_dmg
 
 def player_turn(player_character, derived_stats_list, current_hp, enemy_derived_stats_list, enemy_current_hp):
+    # Initialise all non class specific variables at the start of the turn
+    is_healing = "not healing"
+    
     display_text("ACTIONS:")
     print()
     if player_character.player_class == "knight":
+        # Initialise all class variables at the start of the turn
+        knight_blocking = "not blocking"
+
         display_text("[1] GREATSWORD SWING: Slash the enemy with a heavy downward swing of your greatsword (deals moderate damage)")
         display_text("[2] PALISADE FORM: Raise your shield forming an unbreakable guard (blocks all next attack's damage recieved)")
         display_text("[3] HEAL: Drink up a brew from the tavern (restores some HP)")
@@ -558,14 +572,20 @@ def player_turn(player_character, derived_stats_list, current_hp, enemy_derived_
                 print("Enemy's next attack will be blocked")
                 # DEAL DAMAGE FUNCTION HAS NO EFFECT HERE
                 # PRINT ATTACK BLOCKED MESSAGE INSTEAD
-                return enemy_current_hp
+
+                # Artificial enemy turn to print blocked message:
+                #ADD HERE LATER
+
+                knight_blocking = "blocking"
                 valid_choice = True
+                return knight_blocking
             elif action == "3":
                 display_text("You pull the potion from your satchel and take a good swig")
                 time.sleep(0.5)
                 #current_hp = heal(derived_stats_list, current_hp)
                 valid_choice = True
-                return enemy_current_hp
+                is_healing = "healing"
+                return is_healing
             else:
                 display_text("Please pick a valid option (1, 2, 3)")
                 valid_choice = False
@@ -582,20 +602,40 @@ def player_turn(player_character, derived_stats_list, current_hp, enemy_derived_
             if action == "1":
                 display_text("You unsheath your pristinely sharpened blade, slashing the enemy")
                 time.sleep(0.5)
-                print("They take", derived_stats_list[2], "damage")
+                # Calculate if samurai deals a critical hit
+                crit_chance = random.randint(1,10)
+                if crit_chance == 1:
+                    is_crit_hit = True
+                    print("CRITICAL HIT, X2 damage")
+                else:
+                    is_crit_hit = False
+                    print("No critical hit, you deal normal damage")
+
                 # DEAL DAMAGE FUNCTION HERE
+                if is_crit_hit == True:
+                    damage_to_deal = derived_stats_list[2] * 2
+                else:
+                    damage_to_deal = derived_stats_list[2]
+                print("They take", damage_to_deal, "damage")
+                enemy_current_hp = player_deal_damage(damage_to_deal, enemy_derived_stats_list, enemy_current_hp)
                 valid_choice = True
+                return enemy_current_hp
             elif action == "2":
                 display_text("You pull a whetstone from your satchel and run it up and down the smooth edge of your katana")
                 time.sleep(0.5)
                 print("Increased chance of a critical strike next turn")
-                # DEAL DAMAGE FUNCTION HERE WITH CRIT MULTIPLIER
+                # CRIT MULTIPLIER HERE
+                
                 valid_choice = True
+                crit_chance_up = "increased crit"
+                return crit_chance_up
             elif action == "3":
                 display_text("You pull the potion from your satchel and take a good swig")
                 time.sleep(0.5)
-                current_hp = heal(derived_stats_list, current_hp)
+                #current_hp = heal(derived_stats_list, current_hp)
                 valid_choice = True
+                is_healing = "healing"
+                return is_healing
             else:
                 display_text("Please pick a valid option (1, 2, 3)")
                 valid_choice = False
