@@ -503,9 +503,7 @@ def combat_loop(player_character, derived_stats_list, current_hp, enemy_structur
             if returned_action == "healing":
                 current_hp = heal(derived_stats_list, current_hp)
             elif returned_action == "blocking": # KNIGHT special action - block
-                returned_action == player_turn(player_character, derived_stats_list, current_hp, enemy_derived_stats_list, enemy_current_hp)
-            elif returned_action == "increased crit":
-                crit_chance_multiplier = 3 # YOU WERE MAKING THE SAMURAI CRIT MULTIPLIER WORK!!!
+                returned_action = player_turn(player_character, derived_stats_list, current_hp, enemy_derived_stats_list, enemy_current_hp)
             # If no special action applied, let the enemy take dmg
             else:
                 returned_action = enemy_current_hp 
@@ -592,7 +590,7 @@ def player_turn(player_character, derived_stats_list, current_hp, enemy_derived_
         valid_choice = False
     elif player_character.player_class == "samurai":
         display_text("[1] KATANA SLASH: Draw your blade at lightning speed and use the momentum to swing at the enemy (deals moderate damage with a chance to deal a critical strike)")
-        display_text("[2] SHARPEN KATANA: Sharpen your sword mid combat (greatly incresases chance of a critical strike next turn)")
+        display_text("[2] FLAWED STRIKE: You take an unorthodox, risky form to strike the enemy (has equal chance to deal either triple damage or none)")
         display_text("[3] HEAL: Drink up a brew from the tavern (restores some HP)")
         print("ADD MORE ACTIONS LIKE RUN AWAY ONCE MADE")
         print()
@@ -621,14 +619,27 @@ def player_turn(player_character, derived_stats_list, current_hp, enemy_derived_
                 valid_choice = True
                 return enemy_current_hp
             elif action == "2":
-                display_text("You pull a whetstone from your satchel and run it up and down the smooth edge of your katana")
+                display_text("You raise your blade high over your head and bring it down too fast to be accurate")
                 time.sleep(0.5)
-                print("Increased chance of a critical strike next turn")
-                # CRIT MULTIPLIER HERE
-                
+                print("50/50 to deal X3 damage or none")
+                # NEW ATTACK HERE
+                crit_chance = random.randint(1,2)
+                if crit_chance == 1:
+                    is_crit_hit = True
+                    print("CRITICAL HIT, X3 damage")
+                else:
+                    is_crit_hit = False
+                    print("No critical hit, your attack misses")
+
+                # DEAL DAMAGE FUNCTION HERE
+                if is_crit_hit == True:
+                    damage_to_deal = derived_stats_list[2] * 3
+                else:
+                    damage_to_deal = 0
+                print("They take", damage_to_deal, "damage")
+                enemy_current_hp = player_deal_damage(damage_to_deal, enemy_derived_stats_list, enemy_current_hp)
                 valid_choice = True
-                crit_chance_up = "increased crit"
-                return crit_chance_up
+                return enemy_current_hp
             elif action == "3":
                 display_text("You pull the potion from your satchel and take a good swig")
                 time.sleep(0.5)
