@@ -101,7 +101,7 @@ def display_text(text_to_display):
     for letter in text:
         print(letter, end='')  
         sys.stdout.flush()  
-        time.sleep(0.0)  
+        time.sleep(0.02)  
     print("")
 
 # -------------------------------------------------------
@@ -506,19 +506,23 @@ def combat_loop(player_character, derived_stats_list, current_hp, enemy_structur
                 returned_action = player_turn(player_character, derived_stats_list, current_hp, enemy_derived_stats_list, enemy_current_hp)
             # If no special action applied, let the enemy take dmg
             else:
-                returned_action = enemy_current_hp 
+                enemy_current_hp = returned_action 
         if enemy_current_hp > 0 and current_hp > 0:
             display_text("Enemy turn:")
             print()
             current_hp = enemy_turn(enemy_derived_stats_list, current_hp)
 
     if enemy_current_hp <= 0:
-        display_text("You win")
+        print("--------------------------")
+        display_text("YOU WIN")
+        print("--------------------------")
     elif current_hp <= 0:
-        print("You loose")
+        print("--------------------------")
+        display_text("YOU DIED")
+        print("--------------------------")          
 
 def derived_stats(player_character):
-    hp_max = player_character.vig * 20
+    hp_max = player_character.vig * 35
     if player_character.player_class == "mage" or player_character.player_class == "necromancer":
         mana = player_character.mind * 10
     else:
